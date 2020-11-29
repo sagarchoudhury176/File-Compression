@@ -1,0 +1,2002 @@
+FoundationsIntroduction
+This part will start you thinking about designing and analyzing algorithms. It is
+intended to be a gentle introduction to how we specify algorithms, some of the
+design strategies we will use throughout this book, and many of the fundamental
+ideas used in algorithm analysis. Later parts of this book will build upon this base.
+Chapter 1 provides an overview of algorithms and their place in modern com-
+puting systems. This chapter defines what an algorithm is and lists some examples.
+It also makes a case that we should consider algorithms as a technology, along-
+side technologies such as fast hardware, graphical user interfaces, object-oriented
+systems, and networks.
+In Chapter 2, we see our first algorithms, which solve the problem of sorting
+a sequence of n numbers. They are written in a pseudocode which, although not
+directly translatable to any conventional programming language, conveys the struc-
+ture of the algorithm clearly enough that you should be able to implement it in the
+language of your choice. The sorting algorithms we examine are insertion sort,
+which uses an incremental approach, and merge sort, which uses a recursive tech-
+nique known as “divide-and-conquer.” Although the time each requires increases
+with the value of n, the rate of increase differs between the two algorithms. We
+determine these running times in Chapter 2, and we develop a useful notation to
+express them.
+Chapter 3 precisely defines this notation, which we call asymptotic notation. It
+starts by defining several asymptotic notations, which we use for bounding algo-
+rithm running times from above and/or below. The rest of Chapter 3 is primarily
+a presentation of mathematical notation, more to ensure that your use of notation
+matches that in this book than to teach you new mathematical concepts.4
+Part I Foundations
+Chapter 4 delves further into the divide-and-conquer method introduced in
+Chapter 2. It provides additional examples of divide-and-conquer algorithms, in-
+cluding Strassen’s surprising method for multiplying two square matrices. Chap-
+ter 4 contains methods for solving recurrences, which are useful for describing
+the running times of recursive algorithms. One powerful technique is the “mas-
+ter method,” which we often use to solve recurrences that arise from divide-and-
+conquer algorithms. Although much of Chapter 4 is devoted to proving the cor-
+rectness of the master method, you may skip this proof yet still employ the master
+method.
+Chapter 5 introduces probabilistic analysis and randomized algorithms. We typ-
+ically use probabilistic analysis to determine the running time of an algorithm in
+cases in which, due to the presence of an inherent probability distribution, the
+running time may differ on different inputs of the same size. In some cases, we
+assume that the inputs conform to a known probability distribution, so that we are
+averaging the running time over all possible inputs. In other cases, the probability
+distribution comes not from the inputs but from random choices made during the
+course of the algorithm. An algorithm whose behavior is determined not only by its
+input but by the values produced by a random-number generator is a randomized
+algorithm. We can use randomized algorithms to enforce a probability distribution
+on the inputs—thereby ensuring that no particular input always causes poor perfor-
+mance—or even to bound the error rate of algorithms that are allowed to produce
+incorrect results on a limited basis.
+Appendices A–D contain other mathematical material that you will find helpful
+as you read this book. You are likely to have seen much of the material in the
+appendix chapters before having read this book (although the specific definitions
+and notational conventions we use may differ in some cases from what you have
+seen in the past), and so you should think of the Appendices as reference material.
+On the other hand, you probably have not already seen most of the material in
+Part I. All the chapters in Part I and the Appendices are written with a tutorial
+flavor.1 The Role of Algorithms in Computing
+What are algorithms? Why is the study of algorithms worthwhile? What is the role
+of algorithms relative to other technologies used in computers? In this chapter, we
+will answer these questions.
+1.1 Algorithms
+Informally, an algorithm is any well-defined computational procedure that takes
+some value, or set of values, as input and produces some value, or set of values, as
+output. An algorithm is thus a sequence of computational steps that transform the
+input into the output.
+We can also view an algorithm as a tool for solving a well-specified computa-
+tional problem. The statement of the problem specifies in general terms the desired
+input/output relationship. The algorithm describes a specific computational proce-
+dure for achieving that input/output relationship.
+For example, we might need to sort a sequence of numbers into nondecreasing
+order. This problem arises frequently in practice and provides fertile ground for
+introducing many standard design techniques and analysis tools. Here is how we
+formally define the sorting problem:
+Input: A sequence of n numbers ha1;a2; :::; ani.
+Output: A permutation (reordering) ha0
+1;a0
+that a0
+1  a0
+2    a0
+n.
+For example, given the input sequence h31; 41; 59; 26; 41; 58i, a sorting algorithm
+returns as output the sequence h26; 31; 41; 41; 58; 59i. Such an input sequence is
+called an instance of the sorting problem. In general, an instance of a problem
+consists of the input (satisfying whatever constraints are imposed in the problem
+statement) needed to compute a solution to the problem.
+2; :::; a0
+ni of the input sequence such6
+Chapter 1 The Role ofAlgorithms in Computing
+Because many programs use it as an intermediate step, sorting is a fundamental
+operation in computer science. As a result, we have a large number of good sorting
+algorithms at our disposal. Which algorithm is best for a given application depends
+on—among other factors—the number of items to be sorted, the extent to which
+the items are already somewhat sorted, possible restrictions on the item values,
+the architecture of the computer, and the kind of storage devices to be used: main
+memory, disks, or even tapes.
+An algorithm is said to be correct if, for every input instance, it halts with the
+correct output. We say that a correct algorithm solves the given computational
+problem. An incorrect algorithm might not halt at all on some input instances, or it
+might halt with an incorrect answer. Contrary to what you might expect, incorrect
+algorithms can sometimes be useful, if we can control their error rate. We shall see
+an example of an algorithm with a controllable error rate in Chapter 31 when we
+study algorithms for finding large prime numbers. Ordinarily, however, we shall
+be concerned only with correct algorithms.
+An algorithm can be specified in English, as a computer program, or even as
+a hardware design. The only requirement is that the specification must provide a
+precise description of the computational procedure to be followed.
+What kinds of problems are solved by algorithms?
+Sorting is by no means the only computational problem for which algorithms have
+been developed. (You probably suspected as much when you saw the size of this
+book.) Practical applications of algorithms are ubiquitous and include the follow-
+ing examples:
+
+The Human Genome Project has made great progress toward the goals of iden-
+tifying all the 100,000 genes in human DNA, determining the sequences of the
+3 billion chemical base pairs that make up human DNA, storing this informa-
+tion in databases, and developing tools for data analysis. Each of these steps
+requires sophisticated algorithms. Although the solutions to the various prob-
+lems involved are beyond the scope of this book, many methods to solve these
+biological problems use ideas from several of the chapters in this book, thereby
+enabling scientists to accomplish tasks while using resources efficiently. The
+savings are in time, both human and machine, and in money, as more informa-
+tion can be extracted from laboratory techniques.
+
+The Internet enables people all around the world to quickly access and retrieve
+large amounts of information. With the aid of clever algorithms, sites on the
+Internet are able to manage and manipulate this large volume of data. Examples
+of problems that make essential use of algorithms include finding good routes
+on which the data will travel (techniques for solving such problems appear in1.1 Algorithms
+7
+Chapter 24), and using a search engine to quickly find pages on which particular
+information resides (related techniques are in Chapters 11 and 32).
+
+Electronic commerce enables goods and services to be negotiated and ex-
+changed electronically, and it depends on the privacy of personal informa-
+tion such as credit card numbers, passwords, and bank statements. The core
+technologies used in electronic commerce include public-key cryptography and
+digital signatures (covered in Chapter 31), which are based on numerical algo-
+rithms and number theory.
+
+Manufacturing and other commercial enterprises often need to allocate scarce
+resources in the most beneficial way. An oil company may wish to know where
+to place its wells in order to maximize its expected profit. A political candidate
+may want to determine where to spend money buying campaign advertising in
+order to maximize the chances of winning an election. An airline may wish
+to assign crews to flights in the least expensive way possible, making sure that
+each flight is covered and that government regulations regarding crew schedul-
+ing are met. An Internet service provider may wish to determine where to place
+additional resources in order to serve its customers more effectively. All of
+these are examples of problems that can be solved using linear programming,
+which we shall study in Chapter 29.
+Although some of the details of these examples are beyond the scope of this
+book, we do give underlying techniques that apply to these problems and problem
+areas. We also show how to solve many specific problems, including the following:
+
+We are given a road map on which the distance between each pair of adjacent
+intersections is marked, and we wish to determine the shortest route from one
+intersection to another. The number of possible routes can be huge, even if we
+disallow routes that cross over themselves. How do we choose which of all
+possible routes is the shortest? Here, we model the road map (which is itself
+a model of the actual roads) as a graph (which we will meet in Part VI and
+Appendix B), and we wish to find the shortest path from one vertex to another
+in the graph. We shall see how to solve this problem efficiently in Chapter 24.
+
+We are given two ordered sequences of symbols, X Dhx1;x2; :::; xmi and
+Y Dhy1;y2; :::; yni, and we wish to find a longest common subsequence of
+X and Y. A subsequence of X is just X with some (or possibly all or none) of
+its elements removed. For example, one subsequence of hA;B; C;D; E; F; Gi
+would be hB; C; E; Gi. The length of a longest common subsequence of X
+and Y gives one measure of how similar these two sequences are. For example,
+if the two sequences are base pairs in DNA strands, then we might consider
+them similar if they have a long common subsequence. If X has m symbols
+and Y has n symbols, then X and Y have 2m and 2n possible subsequences,8
+Chapter 1 The Role ofAlgorithms in Computing
+respectively. Selecting all possible subsequences of X and Y and matching
+them up could take a prohibitively long time unless m and n are very small.
+We shall see in Chapter 15 how to use a general technique known as dynamic
+programming to solve this problem much more efficiently.
+
+We are given a mechanical design in terms of a library of parts, where each part
+may include instances of other parts, and we need to list the parts in order so
+that each part appears before any part that uses it. If the design comprises n
+parts, then there are nŠ possible orders, where nŠ denotes the factorial function.
+Because the factorial function grows faster than even an exponential function,
+we cannot feasibly generate each possible order and then verify that, within
+that order, each part appears before the parts using it (unless we have only a
+few parts). This problem is an instance of topological sorting, and we shall see
+in Chapter 22 how to solve this problem efficiently.
+
+We are given n points in the plane, and we wish to find the convex hull of
+these points. The convex hull is the smallest convex polygon containing the
+points. Intuitively, we can think of each point as being represented by a nail
+sticking out from a board. The convex hull would be represented by a tight
+rubber band that surrounds all the nails. Each nail around which the rubber
+band makes a turn is a vertex of the convex hull. (See Figure 33.6 on page 1029
+for an example.) Any of the 2n subsets of the points might be the vertices
+of the convex hull. Knowing which points are vertices of the convex hull is
+not quite enough, either, since we also need to know the order in which they
+appear. There are many choices, therefore, for the vertices of the convex hull.
+Chapter 33 gives two good methods for finding the convex hull.
+These lists are far from exhaustive (as you again have probably surmised from
+this book’s heft), but exhibit two characteristics that are common to many interest-
+ing algorithmic problems:
+1. They have many candidate solutions, the overwhelming majority of which do
+not solve the problem at hand. Finding one that does, or one that is “best,” can
+present quite a challenge.
+2. They have practical applications. Of the problems in the above list, finding the
+shortest path provides the easiest examples. A transportation firm, such as a
+trucking or railroad company, has a financial interest in finding shortest paths
+through a road or rail network because taking shorter paths results in lower
+labor and fuel costs. Or a routing node on the Internet may need to find the
+shortest path through the network in order to route a message quickly. Or a
+person wishing to drive from New York to Boston may want to find driving
+directions from an appropriate Web site, or she may use her GPS while driving.1.1 Algorithms
+9
+Not every problem solved by algorithms has an easily identified set of candidate
+solutions. For example, suppose we are given a set of numerical values represent-
+ing samples of a signal, and we want to compute the discrete Fourier transform of
+these samples. The discrete Fourier transform converts the time domain to the fre-
+quency domain, producing a set of numerical coefficients, so that we can determine
+the strength of various frequencies in the sampled signal. In addition to lying at
+the heart of signal processing, discrete Fourier transforms have applications in data
+compression and multiplying large polynomials and integers. Chapter 30 gives
+an efficient algorithm, the fast Fourier transform (commonly called the FFT), for
+this problem, and the chapter also sketches out the design of a hardware circuit to
+compute the FFT.
+Data structures
+This book also contains several data structures. A data structure is a way to store
+and organize data in order to facilitate access and modifications. No single data
+structure works well for all purposes, and so it is important to know the strengths
+and limitations of several of them.
+Technique
+Although you can use this book as a “cookbook” for algorithms, you may someday
+encounter a problem for which you cannot readily find a published algorithm (many
+of the exercises and problems in this book, for example). This book will teach you
+techniques of algorithm design and analysis so that you can develop algorithms on
+your own, show that they give the correct answer, and understand their efficiency.
+Different chapters address different aspects of algorithmic problem solving. Some
+chapters address specific problems, such as finding medians and order statistics in
+Chapter 9, computing minimum spanning trees in Chapter 23, and determining a
+maximum flow in a network in Chapter 26. Other chapters address techniques,
+such as divide-and-conquer in Chapter 4, dynamic programming in Chapter 15,
+and amortized analysis in Chapter 17.
+Hard problems
+Most of this book is about efficient algorithms. Our usual measure of efficiency
+is speed, i.e., how long an algorithm takes to produce its result. There are some
+problems, however, for which no efficient solution is known. Chapter 34 studies
+an interesting subset of these problems, which are known as NP-complete.
+Why are NP-complete problems interesting? First, although no efficient algo-
+rithm for an NP-complete problem has ever been found, nobody has ever proven10
+Chapter 1 The Role ofAlgorithms in Computing
+that an efficient algorithm for one cannot exist. In other words, no one knows
+whether or not efficient algorithms exist for NP-complete problems. Second, the
+set of NP-complete problems has the remarkable property that if an efficient algo-
+rithm exists for any one of them, then efficient algorithms exist for all of them. This
+relationship among the NP-complete problems makes the lack of efficient solutions
+all the more tantalizing. Third, several NP-complete problems are similar, but not
+identical, to problems for which we do know of efficient algorithms. Computer
+scientists are intrigued by how a small change to the problem statement can cause
+a big change to the efficiency of the best known algorithm.
+You should know about NP-complete problems because some of them arise sur-
+prisingly often in real applications. If you are called upon to produce an efficient
+algorithm for an NP-complete problem, you are likely to spend a lot of time in a
+fruitless search. If you can show that the problem is NP-complete, you can instead
+spend your time developing an efficient algorithm that gives a good, but not the
+best possible, solution.
+As a concrete example, consider a delivery company with a central depot. Each
+day, it loads up each delivery truck at the depot and sends it around to deliver goods
+to several addresses. At the end of the day, each truck must end up back at the depot
+so that it is ready to be loaded for the next day. To reduce costs, the company wants
+to select an order of delivery stops that yields the lowest overall distance traveled
+by each truck. This problem is the well-known “traveling-salesman problem,” and
+it is NP-complete. It has no known efficient algorithm. Under certain assumptions,
+however, we know of efficient algorithms that give an overall distance which is
+not too far above the smallest possible. Chapter 35 discusses such “approximation
+algorithms.”
+Parallelism
+For many years, we could count on processor clock speeds increasing at a steady
+rate. Physical limitations present a fundamental roadblock to ever-increasing clock
+speeds, however: because power density increases superlinearly with clock speed,
+chips run the risk ofmelting once their clock speeds become high enough. In order
+to perform more computations per second, therefore, chips are being designed to
+contain not just one but several processing “cores.” We can liken these multicore
+computers to several sequential computers on a single chip; in other words, they are
+a type of “parallel computer.” In order to elicit the best performance from multicore
+computers, we need to design algorithms with parallelism in mind. Chapter 27
+presents a model for “multithreaded” algorithms, which take advantage ofmultiple
+cores. This model has advantages from a theoretical standpoint, and it forms the
+basis of several successful computer programs, including a championship chess
+program.1.2 Algorithms as a technology
+11
+Exercises
+1.1-1
+Give a real-world example that requires sorting or a real-world example that re-
+quires computing a convex hull.
+1.1-2
+Other than speed, what other measures of efficiency might one use in a real-world
+setting?
+1.1-3
+Select a data structure that you have seen previously, and discuss its strengths and
+limitations.
+1.1-4
+How are the shortest-path and traveling-salesman problems given above similar?
+How are they different?
+1.1-5
+Come up with a real-world problem in which only the best solution will do. Then
+come up with one in which a solution that is “approximately” the best is good
+enough.
+1.2 Algorithms as a technology
+Suppose computers were infinitely fast and computer memory was free. Would
+you have any reason to study algorithms? The answer is yes, if for no other reason
+than that you would still like to demonstrate that your solution method terminates
+and does so with the correct answer.
+If computers were infinitely fast, any correct method for solving a problem
+would do. You would probably want your implementation to be within the bounds
+of good software engineering practice (for example, your implementation should
+be well designed and documented), but you would most often use whichever
+method was the easiest to implement.
+Of course, computers may be fast, but they are not infinitely fast. And memory
+may be inexpensive, but it is not free. Computing time is therefore a bounded
+resource, and so is space in memory. You should use these resources wisely, and
+algorithms that are efficient in terms of time or space will help you do so.12
+Chapter 1 The Role ofAlgorithms in Computing
+Efficiency
+Different algorithms devised to solve the same problem often differ dramatically in
+their efficiency. These differences can be much more significant than differences
+due to hardware and software.
+As an example, in Chapter 2, we will see two algorithms for sorting. The first,
+known as insertion sort, takes time roughly equal to c1n2 to sort n items, where c1
+is a constant that does not depend on n. That is, it takes time roughly proportional
+to n2. The second, merge sort, takes time roughly equal to c2n lg n, where lg n
+stands for log2 n and c2 is another constant that also does not depend on n. Inser-
+tion sort typically has a smaller constant factor than merge sort, so that c1 <c2.
+We shall see that the constant factors can have far less of an impact on the running
+time than the dependence on the input size n. Let’s write insertion sort’s running
+time as c1n  n and merge sort’s running time as c2n  lg n. Then we see that where
+insertion sort has a factor of n in its running time, merge sort has a factor of lg n,
+which is much smaller. (For example, when n D 1000,lg n is approximately 10,
+and when n equals one million, lg n is approximately only 20.) Although insertion
+sort usually runs faster than merge sort for small input sizes, once the input size n
+becomes large enough, merge sort’s advantage of lg n vs. n will more than com-
+pensate for the difference in constant factors. No matter how much smaller c1 is
+than c2, there will always be a crossover point beyond which merge sort is faster.
+For a concrete example, let us pit a faster computer (computer A) running inser-
+tion sort against a slower computer (computer B) running merge sort. They each
+must sort an array of 10 million numbers. (Although 10 million numbers might
+seem like a lot, if the numbers are eight-byte integers, then the input occupies
+about 80 megabytes, which fits in the memory of even an inexpensive laptop com-
+puter many times over.) Suppose that computer A executes 10 billion instructions
+per second (faster than any single sequential computer at the time of this writing)
+and computer B executes only 10 million instructions per second, so that com-
+puter A is 1000 times faster than computer B in raw computing power. To make
+the difference even more dramatic, suppose that the world’s craftiest programmer
+codes insertion sort in machine language for computer A, and the resulting code
+requires 2n2 instructions to sort n numbers. Suppose further that just an average
+programmer implements merge sort, using a high-level language with an inefficient
+compiler, with the resulting code taking 50n lg n instructions. To sort 10 million
+numbers, computer A takes
+2  .107/2 instructions
+1010 instructions/second
+while computer B takes
+D 20,000 seconds (more than 5.5 hours) ;1.2 Algorithms as a technology
+13
+50  107 lg 107 instructions
+107 instructions/second
+ 1163 seconds (less than 20 minutes) :
+By using an algorithm whose running time grows more slowly, even with a poor
+compiler, computer B runs more than 17 times faster than computer A! The advan-
+tage of merge sort is even more pronounced when we sort 100 million numbers:
+where insertion sort takes more than 23 days, merge sort takes under four hours.
+In general, as the problem size increases, so does the relative advantage of merge
+sort.
+Algorithms and other technologies
+The example above shows that we should consider algorithms, like computer hard-
+ware, as a technology. Total system performance depends on choosing efficient
+algorithms as much as on choosing fast hardware. Just as rapid advances are being
+made in other computer technologies, they are being made in algorithms as well.
+You might wonder whether algorithms are truly that important on contemporary
+computers in light of other advanced technologies, such as
+
+
+
+
+
+advanced computer architectures and fabrication technologies,
+easy-to-use, intuitive, graphical user interfaces (GUIs),
+object-oriented systems,
+integrated Web technologies, and
+fast networking, both wired and wireless.
+The answer is yes. Although some applications do not explicitly require algorith-
+mic content at the application level (such as some simple, Web-based applications),
+many do. For example, consider a Web-based service that determines how to travel
+from one location to another. Its implementation would rely on fast hardware, a
+graphical user interface, wide-area networking, and also possibly on object ori-
+entation. However, it would also require algorithms for certain operations, such
+as finding routes (probably using a shortest-path algorithm), rendering maps, and
+interpolating addresses.
+Moreover, even an application that does not require algorithmic content at the
+application level relies heavily upon algorithms. Does the application rely on fast
+hardware? The hardware design used algorithms. Does the application rely on
+graphical user interfaces? The design of any GUI relies on algorithms. Does the
+application rely on networking? Routing in networks relies heavily on algorithms.
+Was the application written in a language other than machine code? Then it was
+processed by a compiler, interpreter, or assembler, all of which make extensive use14
+Chapter 1 The Role ofAlgorithms in Computing
+of algorithms. Algorithms are at the core of most technologies used in contempo-
+rary computers.
+Furthermore, with the ever-increasing capacities of computers, we use them to
+solve larger problems than ever before. As we saw in the above comparison be-
+tween insertion sort and merge sort, it is at larger problem sizes that the differences
+in efficiency between algorithms become particularly prominent.
+Having a solid base of algorithmic knowledge and technique is one characteristic
+that separates the truly skilled programmers from the novices. With modern com-
+puting technology, you can accomplish some tasks without knowing much about
+algorithms, but with a good background in algorithms, you can do much, much
+more.
+Exercises
+1.2-1
+Give an example of an application that requires algorithmic content at the applica-
+tion level, and discuss the function of the algorithms involved.
+1.2-2
+Suppose we are comparing implementations of insertion sort and merge sort on the
+same machine. For inputs of size n, insertion sort runs in 8n2 steps, while merge
+sort runs in 64n lg n steps. For which values of n does insertion sort beat merge
+sort?
+1.2-3
+What is the smallest value of n such that an algorithm whose running time is 100n2
+runs faster than an algorithm whose running time is 2n on the same machine?
+Problems
+1-1 Comparison ofrunning times
+For each function f.n/ and time t in the following table, determine the largest
+size n of a problem that can be solved in time t , assuming that the algorithm to
+solve the problem takes f.n/ microseconds.Notes for Chapter 1
+15
+1
+lg n
+p
+n
+n
+n lg n
+n2
+n3
+2n
+nŠ
+Chapter notes
+There are many excellent texts on the general topic of algorithms, including those
+by Aho, Hopcroft, and Ullman [5, 6]; Baase and Van Gelder [28]; Brassard and
+Bratley [54]; Dasgupta, Papadimitriou, and Vazirani [82]; Goodrich and Tamassia
+[148]; Hofri [175]; Horowitz, Sahni, and Rajasekaran [181]; Johnsonbaugh and
+Schaefer [193]; Kingston [205]; Kleinberg and Tardos [208]; Knuth [209, 210,
+211]; Kozen [220]; Levitin [235]; Manber [242]; Mehlhorn [249, 250, 251]; Pur-
+dom and Brown [287]; Reingold, Nievergelt, and Deo [293]; Sedgewick [306];
+Sedgewick and Flajolet [307]; Skiena [318]; and Wilf [356]. Some of the more
+practical aspects of algorithm design are discussed by Bentley [42, 43] and Gonnet
+[145]. Surveys of the field of algorithms can also be found in the Handbook ofThe-
+oretical Computer Science, Volume A [342] and the CRC Algorithms and Theory of
+Computation Handbook [25]. Overviews of the algorithms used in computational
+biology can be found in textbooks by Gusfield [156], Pevzner [275], Setubal and
+Meidanis [310], and Waterman [350].
+1
+second minute
+1
+hour
+1
+1
+day month
+1
+year
+1
+century2 Getting Started
+This chapter will familiarize you with the framework we shall use throughout the
+book to think about the design and analysis of algorithms. It is self-contained, but
+it does include several references to material that we introduce in Chapters 3 and 4.
+(It also contains several summations, which Appendix A shows how to solve.)
+We begin by examining the insertion sort algorithm to solve the sorting problem
+introduced in Chapter 1. We define a “pseudocode” that should be familiar to you if
+you have done computer programming, and we use it to show how we shall specify
+our algorithms. Having specified the insertion sort algorithm, we then argue that it
+correctly sorts, and we analyze its running time. The analysis introduces a notation
+that focuses on how that time increases with the number of items to be sorted.
+Following our discussion of insertion sort, we introduce the divide-and-conquer
+approach to the design of algorithms and use it to develop an algorithm called
+merge sort. We end with an analysis of merge sort’s running time.
+2.1 Insertion sort
+Our first algorithm, insertion sort, solves the sorting problem introduced in Chap-
+ter 1:
+Input: A sequence of n numbers ha1;a2; :::; ani.
+Output: A permutation (reordering) ha0
+1;a0
+that a0
+1  a0
+2    a0
+n.
+The numbers that we wish to sort are also known as the keys. Although conceptu-
+ally we are sorting a sequence, the input comes to us in the form of an array with n
+elements.
+In this book, we shall typically describe algorithms as programs written in a
+pseudocode that is similar in many respects to C, C++, Java, Python, or Pascal. If
+you have been introduced to any of these languages, you should have little trouble
+2; ::: ; a0
+ni of the input sequence such2.1 Insertion sort
+17
+Figure 2.1 Sorting a hand of cards using insertion sort.
+reading our algorithms. What separates pseudocode from “real” code is that in
+pseudocode, we employ whatever expressive method is most clear and concise to
+specify a given algorithm. Sometimes, the clearest method is English, so do not
+be surprised if you come across an English phrase or sentence embedded within
+a section of “real” code. Another difference between pseudocode and real code
+is that pseudocode is not typically concerned with issues of software engineering.
+Issues of data abstraction, modularity, and error handling are often ignored in order
+to convey the essence of the algorithm more concisely.
+We start with insertion sort, which is an efficient algorithm for sorting a small
+number of elements. Insertion sort works the way many people sort a hand of
+playing cards. We start with an empty left hand and the cards face down on the
+table. We then remove one card at a time from the table and insert it into the
+correct position in the left hand. To find the correct position for a card, we compare
+it with each of the cards already in the hand, from right to left, as illustrated in
+Figure 2.1. At all times, the cards held in the left hand are sorted, and these cards
+were originally the top cards of the pile on the table.
+We present our pseudocode for insertion sort as a procedure called INSERTION-
+SORT, which takes as a parameter an array AŒ1 : : n containing a sequence of
+length n that is to be sorted. (In the code, the number n of elements in A is denoted
+by A:length.) The algorithm sorts the input numbers in place: it rearranges the
+numbers within the array A, with at most a constant number of them stored outside
+the array at any time. The input array A contains the sorted output sequence when
+the INSERTION-SORT procedure is finished.
+2
+♣
+♣
+2 ♣
+♣
+10
+♣
+♣ ♣
+♣ ♣
+♣
+4
+♣
+♣ ♣
+4 ♣ ♣
+♣
+10
+♣
+♣ ♣
+♣ ♣
+♣
+5
+♣
+♣ ♣
+♣
+5 ♣ ♣
+♣
+7
+♣
+♣ ♣
+♣ ♣
+♣
+7 ♣ ♣
+♣18
+Chapter 2 Getting Started
+123456
+(a) 5 2 4613
+123456
+(d) 2456 1 3
+123456
+(b) 25 4 613
+123456
+(e) 1 2456 3
+123456
+(c) 245 6 13
+(f)
+123456
+2
+1
+3
+4 5 6
+Figure 2.2 The operation of INSERTION-SORT on the array A Dh5; 2; 4; 6; 1; 3i. Array indices
+appear above the rectangles, and values stored in the array positions appear within the rectangles.
+(a)–(e) The iterations of the for loop of lines 1–8. In each iteration, the black rectangle holds the
+key taken from AŒj , which is compared with the values in shaded rectangles to its left in the test of
+line 5. Shaded arrows show array values moved one position to the right in line 6, and black arrows
+indicate where the key moves to in line 8. (f) The final sorted array.
+INSERTION-SORT.A/
+1 for j D 2 to A:length
+2
+3
+4
+5
+6
+7
+8
+key D AŒj 
+// Insert AŒj  into the sorted sequence AŒ1 : : j  1.
+i D j  1
+while i> 0 and AŒi > key
+AŒi C 1 D AŒi
+i D i  1
+AŒi C 1 D key
+Loop invariants and the correctness of insertion sort
+Figure 2.2 shows how this algorithm works for A Dh5; 2; 4; 6; 1; 3i.The in-
+dex j indicates the “current card” being inserted into the hand. At the beginning
+of each iteration of the for loop, which is indexed by j , the subarray consisting
+of elements AŒ1 : : j  1 constitutes the currently sorted hand, and the remaining
+subarray AŒj C 1 ::n corresponds to the pile of cards still on the table. In fact,
+elements AŒ1 : : j  1 are the elements originally in positions 1 through j 1,but
+now in sorted order. We state these properties of AŒ1 : : j  1 formally as a loop
+invariant:
+At the start of each iteration of the for loop of lines 1–8, the subarray
+AŒ1 : : j 1 consists of the elements originally in AŒ1 : : j 1, but in sorted
+order.
+We use loop invariants to help us understand why an algorithm is correct. We
+must show three things about a loop invariant:2.1 Insertion sort
+19
+Initialization: It is true prior to the first iteration of the loop.
+Maintenance: If it is true before an iteration of the loop, it remains true before the
+next iteration.
+Termination: When the loop terminates, the invariant gives us a useful property
+that helps show that the algorithm is correct.
+When the first two properties hold, the loop invariant is true prior to every iteration
+of the loop. (Of course, we are free to use established facts other than the loop
+invariant itself to prove that the loop invariant remains true before each iteration.)
+Note the similarity to mathematical induction, where to prove that a property holds,
+you prove a base case and an inductive step. Here, showing that the invariant holds
+before the first iteration corresponds to the base case, and showing that the invariant
+holds from iteration to iteration corresponds to the inductive step.
+The third property is perhaps the most important one, since we are using the loop
+invariant to show correctness. Typically, we use the loop invariant along with the
+condition that caused the loop to terminate. The termination property differs from
+how we usually use mathematical induction, in which we apply the inductive step
+infinitely; here, we stop the “induction” when the loop terminates.
+Let us see how these properties hold for insertion sort.
+Initialization: We start by showing that the loop invariant holds before the first
+loop iteration, when j D 2.1 The subarray AŒ1 : : j  1, therefore, consists
+of just the single element AŒ1, which is in fact the original element in AŒ1.
+Moreover, this subarray is sorted (trivially, of course), which shows that the
+loop invariant holds prior to the first iteration of the loop.
+Maintenance: Next, we tackle the second property: showing that each iteration
+maintains the loop invariant. Informally, the body of the for loop works by
+moving AŒj  1, AŒj  2, AŒj  3, and so on by one position to the right
+until it finds the proper position for AŒj  (lines 4–7), at which point it inserts
+the value of AŒj  (line 8). The subarray AŒ1 : : j  then consists of the elements
+originally in AŒ1 : : j , but in sorted order. Incrementing j for the next iteration
+of the for loop then preserves the loop invariant.
+A more formal treatment of the second property would require us to state and
+show a loop invariant for the while loop of lines 5–7. At this point, however,
+1When the loop is a for loop, the moment at which we check the loop invariant just prior to the first
+iteration is immediately after the initial assignment to the loop-counter variable and just before the
+first test in the loop header. In the case of INSERTION-SORT, this time is after assigning 2 to the
+variable j but before the first test of whether j  A:length.20
+Chapter 2 Getting Started
+we prefer not to get bogged down in such formalism, and so we rely on our
+informal analysis to show that the second property holds for the outer loop.
+Termination: Finally, we examine what happens when the loop terminates. The
+condition causing the for loop to terminate is that j> A:length D n. Because
+each loop iteration increases j by 1,we must have j D n C 1 at that time.
+Substituting n C 1 for j in the wording of loop invariant, we have that the
+subarray AŒ1 : : n consists of the elements originally in AŒ1 : : n, but in sorted
+order. Observing that the subarray AŒ1 : : n is the entire array, we conclude that
+the entire array is sorted. Hence, the algorithm is correct.
+We shall use this method of loop invariants to show correctness later in this
+chapter and in other chapters as well.
+Pseudocode conventions
+We use the following conventions in our pseudocode.
+
+Indentation indicates block structure. For example, the body of the for loop that
+begins on line 1 consists of lines 2–8, and the body of the while loop that begins
+on line 5 contains lines 6–7 but not line 8. Our indentation style applies to
+if-else statements2 as well. Using indentation instead of conventional indicators
+of block structure, such as begin and end statements, greatly reduces clutter
+while preserving, or even enhancing, clarity.3
+
+The looping constructs while, for,and repeat-until and the if-else conditional
+construct have interpretations similar to those in C, C++, Java, Python, and
+Pascal.4 In this book, the loop counter retains its value after exiting the loop,
+unlike some situations that arise in C++, Java, and Pascal. Thus, immediately
+after a for loop, the loop counter’s value is the value that first exceeded the for
+loop bound. We used this property in our correctness argument for insertion
+sort. The for loop header in line 1 is for j D 2 to A:length, and so when
+this loop terminates, j D A:length C 1 (or, equivalently, j D n C 1,since
+n D A:length). We use the keyword to when a for loop increments its loop
+2In an if-else statement, we indent else at the same level as its matching if. Although we omit the
+keyword then, we occasionally refer to the portion executed when the test following if is true as a
+then clause. For multiway tests, we use elseif for tests after the first one.
+3Each pseudocode procedure in this book appears on one page so that you will not have to discern
+levels of indentation in code that is split across pages.
+4Most block-structured languages have equivalent constructs, though the exact syntax may differ.
+Python lacks repeat-until loops, and its for loops operate a little differently from the for loops in
+this book.2.1 Insertion sort
+21
+counter in each iteration, and we use the keyword downto when a for loop
+decrements its loop counter. When the loop counter changes by an amount
+greater than 1, the amount of change follows the optional keyword by.
+
+
+The symbol “//” indicates that the remainder of the line is a comment.
+Amultiple assignment of the form i D j D e assigns to both variables i and j
+the value of expression e; it should be treated as equivalent to the assignment
+j D e followed by the assignment i D j .
+
+Variables (such as i , j ,and key) are local to the given procedure. We shall not
+use global variables without explicit indication.
+
+We access array elements by specifying the array name followed by the in-
+dex in square brackets. For example, AŒi indicates the ith element of the
+array A. The notation “::” is used to indicate a range of values within an ar-
+ray. Thus, AŒ1 : : j  indicates the subarray of A consisting of the j elements
+AŒ1; AŒ2; :::;AŒj .
+
+We typically organize compound data into objects, which are composed of
+attributes. We access a particular attribute using the syntax found in many
+object-oriented programming languages: the object name, followed by a dot,
+followed by the attribute name. For example, we treat an array as an object
+with the attribute length indicating how many elements it contains. To specify
+the number of elements in an array A, we write A:length.
+We treat a variable representing an array or object as a pointer to the data rep-
+resenting the array or object. For all attributes f of an object x, setting y D x
+causes y:f to equal x:f. Moreover, if we now set x:f D 3, then afterward not
+only does x:f equal 3,but y:f equals 3 as well. In other words, x and y point
+to the same object after the assignment y D x.
+Our attribute notation can “cascade.” For example, suppose that the attribute f
+is itself a pointer to some type of object that has an attribute g. Then the notation
+x:f:g is implicitly parenthesized as .x:f/:g. In other words, if we had assigned
+y D x:f,then x:f:g is the same as y:g.
+Sometimes, a pointer will refer to no object at all. In this case, we give it the
+special value NIL.
+
+We pass parameters to a procedure by value: the called procedure receives its
+own copy of the parameters, and if it assigns a value to a parameter, the change
+is not seen by the calling procedure. When objects are passed, the pointer to
+the data representing the object is copied, but the object’s attributes are not. For
+example, if x is a parameter of a called procedure, the assignment x D y within
+the called procedure is not visible to the calling procedure. The assignment
+x:f D 3, however, is visible. Similarly, arrays are passed by pointer, so that22
+Chapter 2 Getting Started
+a pointer to the array is passed, rather than the entire array, and changes to
+individual array elements are visible to the calling procedure.
+
+A return statement immediately transfers control back to the point of call in
+the calling procedure. Most return statements also take a value to pass back to
+the caller. Our pseudocode differs from many programming languages in that
+we allow multiple values to be returned in a single return statement.
+
+The boolean operators “and” and “or” are short circuiting. That is, when we
+evaluate the expression “x and y”wefirst evaluate x.If x evaluates to FALSE,
+then the entire expression cannot evaluate to TRUE, and so we do not evaluate y.
+If, on the other hand, x evaluates to TRUE,we must evaluate y to determine the
+value of the entire expression. Similarly, in the expression “x or y”weeval-
+uate the expression y only if x evaluates to FALSE. Short-circuiting operators
+allow us to write boolean expressions such as “x ¤ NIL and x:f D y” without
+worrying about what happens when we try to evaluate x:f when x is NIL.
+
+The keyword error indicates that an error occurred because conditions were
+wrong for the procedure to have been called. The calling procedure is respon-
+sible for handling the error, and so we do not specify what action to take.
+Exercises
+2.1-1
+Using Figure 2.2 as a model, illustrate the operation of INSERTION-SORT on the
+array A Dh31; 41; 59; 26; 41; 58i.
+2.1-2
+Rewrite the INSERTION-SORT procedure to sort into nonincreasing instead of non-
+decreasing order.
+2.1-3
+Consider the searching problem:
+Input: A sequence of n numbers A Dha1;a2; :::; ani and a value .
+Output: An index i such that  D AŒi or the special value NIL if  does not
+appear in A.
+Write pseudocode for linear search, which scans through the sequence, looking
+for . Using a loop invariant, prove that your algorithm is correct. Make sure that
+your loop invariant fulfills the three necessary properties.
+2.1-4
+Consider the problem of adding two n-bit binary integers, stored in two n-element
+arrays A and B. The sum of the two integers should be stored in binary form in2.2 Analyzing algorithms
+23
+an .n C 1/-element array C. State the problem formally and write pseudocode for
+adding the two integers.
+2.2 Analyzing algorithms
+Analyzing an algorithm has come to mean predicting the resources that the algo-
+rithm requires. Occasionally, resources such as memory, communication band-
+width, or computer hardware are of primary concern, but most often it is compu-
+tational time that we want to measure. Generally, by analyzing several candidate
+algorithms for a problem, we can identify a most efficient one. Such analysis may
+indicate more than one viable candidate, but we can often discard several inferior
+algorithms in the process.
+Before we can analyze an algorithm, we must have a model of the implemen-
+tation technology that we will use, including a model for the resources of that
+technology and their costs. For most of this book, we shall assume a generic one-
+processor, random-access machine (RAM) model of computation as our imple-
+mentation technology and understand that our algorithms will be implemented as
+computer programs. In the RAM model, instructions are executed one after an-
+other, with no concurrent operations.
+Strictly speaking, we should precisely define the instructions of the RAMmodel
+and their costs. To do so, however, would be tedious and would yield little insight
+into algorithm design and analysis. Yet we must be careful not to abuse the RAM
+model. For example, what if a RAM had an instruction that sorts? Then we could
+sort in just one instruction. Such a RAM would be unrealistic, since real computers
+do not have such instructions. Our guide, therefore, is how real computers are de-
+signed. The RAMmodel contains instructions commonly found in real computers:
+arithmetic (such as add, subtract, multiply, divide, remainder, floor, ceiling), data
+movement (load, store, copy), and control (conditional and unconditional branch,
+subroutine call and return). Each such instruction takes a constant amount of time.
+The data types in the RAMmodel are integer and floating point (for storing real
+numbers). Although we typically do not concern ourselves with precision in this
+book, in some applications precision is crucial. We also assume a limit on the size
+of each word of data. For example, when working with inputs of size n, we typ-
+ically assume that integers are represented by c lg n bits for some constant c  1.
+We require c  1 so that each word can hold the value of n, enabling us to index the
+individual input elements, and we restrict c to be a constant so that the word size
+does not grow arbitrarily. (If the word size could grow arbitrarily, we could store
+huge amounts of data in one word and operate on it all in constant time—clearly
+an unrealistic scenario.)24
+Chapter 2 Getting Started
+Real computers contain instructions not listed above, and such instructions rep-
+resent a gray area in the RAM model. For example, is exponentiation a constant-
+time instruction? In the general case, no; it takes several instructions to compute xy
+when x and y are real numbers. In restricted situations, however, exponentiation is
+a constant-time operation. Many computers have a “shift left” instruction, which
+in constant time shifts the bits of an integer by k positions to the left. In most
+computers, shifting the bits of an integer by one position to the left is equivalent
+to multiplication by 2, so that shifting the bits by k positions to the left is equiv-
+alent to multiplication by 2k. Therefore, such computers can compute 2k in one
+constant-time instruction by shifting the integer 1 by k positions to the left, as long
+as k is no more than the number of bits in a computer word. We will endeavor to
+avoid such gray areas in the RAM model, but we will treat computation of 2k as a
+constant-time operation when k is a small enough positive integer.
+In the RAM model, we do not attempt to model the memory hierarchy that is
+common in contemporary computers. That is, we do not model caches or virtual
+memory. Several computational models attempt to account for memory-hierarchy
+effects, which are sometimes significant in real programs on real machines. A
+handful of problems in this book examine memory-hierarchy effects, but for the
+most part, the analyses in this book will not consider them. Models that include
+the memory hierarchy are quite a bit more complex than the RAM model, and so
+they can be difficult to work with. Moreover, RAM-model analyses are usually
+excellent predictors of performance on actual machines.
+Analyzing even a simple algorithm in the RAM model can be a challenge. The
+mathematical tools required may include combinatorics, probability theory, alge-
+braic dexterity, and the ability to identify the most significant terms in a formula.
+Because the behavior of an algorithm may be different for each possible input, we
+need a means for summarizing that behavior in simple, easily understood formulas.
+Even though we typically select only one machine model to analyze a given al-
+gorithm, we still face many choices in deciding how to express our analysis. We
+would like a way that is simple to write and manipulate, shows the important char-
+acteristics of an algorithm’s resource requirements, and suppresses tedious details.
+Analysis of insertion sort
+The time taken by the INSERTION-SORT procedure depends on the input: sorting a
+thousand numbers takes longer than sorting three numbers. Moreover, INSERTION-
+SORT can take different amounts of time to sort two input sequences of the same
+size depending on how nearly sorted they already are. In general, the time taken
+by an algorithm grows with the size of the input, so it is traditional to describe the
+running time of a program as a function of the size of its input. To do so, we need
+to define the terms “running time” and “size of input” more carefully.2.2 Analyzing algorithms
+25
+The best notion for input size depends on the problem being studied. For many
+problems, such as sorting or computing discrete Fourier transforms, the most nat-
+ural measure is the number of items in the input—for example, the array size n
+for sorting. For many other problems, such as multiplying two integers, the best
+measure of input size is the total number of bits needed to represent the input in
+ordinary binary notation. Sometimes, it is more appropriate to describe the size of
+the input with two numbers rather than one. For instance, if the input to an algo-
+rithm is a graph, the input size can be described by the numbers of vertices and
+edges in the graph. We shall indicate which input size measure is being used with
+each problem we study.
+The running time of an algorithm on a particular input is the number of primitive
+operations or “steps” executed. It is convenient to define the notion of step so
+that it is as machine-independent as possible. For the moment, let us adopt the
+following view. A constant amount of time is required to execute each line of our
+pseudocode. One line may take a different amount of time than another line, but
+we shall assume that each execution of the ith line takes time ci,where ci is a
+constant. This viewpoint is in keeping with the RAM model, and it also reflects
+how the pseudocode would be implemented on most actual computers.5
+In the following discussion, our expression for the running time of INSERTION-
+SORT will evolve from a messy formula that uses all the statement costs ci to a
+much simpler notation that is more concise and more easily manipulated. This
+simpler notation will also make it easy to determine whether one algorithm is more
+efficient than another.
+We start by presenting the INSERTION-SORT procedure with the time “cost”
+of each statement and the number of times each statement is executed. For each
+j D 2; 3; ::: ; n,where n D A:length,we let tj denote the number of times the
+while loop test in line 5 is executed for that value of j.When a for or while loop
+exits in the usual way (i.e., due to the test in the loop header), the test is executed
+one time more than the loop body. We assume that comments are not executable
+statements, and so they take no time.
+5There are some subtleties here. Computational steps that we specify in English are often variants
+of a procedure that requires more than just a constant amount of time. For example, later in this
+book we might say “sort the points by x-coordinate,” which, as we shall see, takes more than a
+constant amount of time. Also, note that a statement that calls a subroutine takes constant time,
+though the subroutine, once invoked, may take more. That is, we separate the process of calling the
+subroutine—passing parameters to it, etc.—from the process of executing the subroutine.26
+Chapter 2 Getting Started
+INSERTION-SORT.A/
+1 for j D 2 to A:length
+key D AŒj 
+4
+6
+7
+8
+i D j  1
+2
+3
+cost times
+n
+n  1
+5 while i> 0 and AŒi > key
+AŒi C 1 D AŒi
+AŒi C 1 D key
+c6
+i D i 1c7
+c8
+n  1
+Pn
+Pn
+Pn
+n  1
+The running time of the algorithm is the sum of running times for each state-
+ment executed; a statement that takes ci steps to execute and executes n times will
+contribute cin to the total running time.6 To compute T.n/, the running time of
+INSERTION-SORT on an input of n values, we sum the products of the cost and
+times columns, obtaining
+T.n/ D c1n C c2.n  1/ C c4.n  1/ C c5
+C c7
+Xn
+jD2
+.tj  1/ C c8.n  1/ :
+Even for inputs of a given size, an algorithm’s running time may depend on
+which input of that size is given. For example, in INSERTION-SORT, the best
+case occurs if the array is already sorted. For each j D 2; 3; ::: ; n, we then find
+that AŒi  key in line 5 when i has its initial value of j  1. Thus tj D 1 for
+j D 2; 3; ::: ; n, and the best-case running time is
+T.n/ D c1n C c2.n  1/ C c4.n  1/ C c5.n  1/ C c8.n  1/
+D .c1 C c2 C c4 C c5 C c8/n  .c2 C c4 C c5 C c8/:
+We can express this running time as an C b for constants a and b that depend on
+the statement costs ci ;itis thus a linear function of n.
+If the array is in reverse sorted order—that is, in decreasing order—the worst
+case results. We must compare each element AŒj  with each element in the entire
+sorted subarray AŒ1 : : j  1,and so tj D j for j D 2; 3; ::: ; n. Noting that
+6This characteristic does not necessarily hold for a resource such as memory. A statement that
+references m words of memory and is executed n times does not necessarily reference mn distinct
+words of memory.
+Xn
+jD2
+tj C c6
+Xn
+jD2
+.tj  1/
+c1
+c2
+// Insert AŒj  into the sorted
+sequence AŒ1 : : j  1.0 n  1
+c4
+c5
+jD2 tj
+jD2.tj  1/
+jD2.tj  1/2.2 Analyzing algorithms
+27
+Xn
+jD2
+and
+Xn
+jD2
+.j  1/ D
+n.n  1/
+2
+(see Appendix A for a review of how to solve these summations), we find that in
+the worst case, the running time of INSERTION-SORT is
+T.n/ D c1n C c2.n  1/ C c4.n  1/ C c5
+
+D
+C c6
+c5
+2
+
+C
+n.n  1/
+2
+c6
+2
+C
+c7
+2
+
+C c7
+
+n2 C c1 C c2 C c4 C
+
+ .c2 C c4 C c5 C c8/:
+We can express this worst-case running time as an2 C bn C c for constants a, b,
+and c that again depend on the statement costs ci ; it is thus a quadratic function
+of n.
+Typically, as in insertion sort, the running time of an algorithm is fixed for a
+given input, although in later chapters we shall see some interesting “randomized”
+algorithms whose behavior can vary even for a fixed input.
+Worst-case and average-case analysis
+In our analysis of insertion sort, we looked at both the best case, in which the input
+array was already sorted, and the worst case, in which the input array was reverse
+sorted. For the remainder of this book, though, we shall usually concentrate on
+finding only the worst-case running time, that is, the longest running time for any
+input of size n. We give three reasons for this orientation.
+
+The worst-case running time of an algorithm gives us an upper bound on the
+running time for any input. Knowing it provides a guarantee that the algorithm
+will never take any longer. We need not make some educated guess about the
+running time and hope that it never gets much worse.
+
+For some algorithms, the worst case occurs fairly often. For example, in search-
+ing a database for a particular piece of information, the searching algorithm’s
+worst case will often occur when the information is not present in the database.
+In some applications, searches for absent information may be frequent.
+
+n.n  1/
+2
+n.n C 1/
+2
+
+c5
+2
+ 1
+C c8.n  1/
+
+c6
+2
+
+c7
+2
+C c8 n
+
+
+j D
+n.n C 1/
+2
+ 128
+Chapter 2 Getting Started
+
+The “average case” is often roughly as bad as the worst case. Suppose that we
+randomly choose n numbers and apply insertion sort. How long does it take to
+determine where in subarray AŒ1 : : j  1 to insert element AŒj ?On average,
+half the elements in AŒ1 : : j  1 are less than AŒj , and half the elements are
+greater. On average, therefore, we check half of the subarray AŒ1 : : j  1,and
+so tj is about j=2. The resulting average-case running time turns out to be a
+quadratic function of the input size, just like the worst-case running time.
+In some particular cases, we shall be interested in the average-case running time
+of an algorithm; we shall see the technique of probabilistic analysis applied to
+various algorithms throughout this book. The scope of average-case analysis is
+limited, because it may not be apparent what constitutes an “average” input for
+a particular problem. Often, we shall assume that all inputs of a given size are
+equally likely. In practice, this assumption may be violated, but we can sometimes
+use a randomized algorithm, which makes random choices, to allow a probabilistic
+analysis and yield an expected running time. We explore randomized algorithms
+more in Chapter 5 and in several other subsequent chapters.
+Order of growth
+We used some simplifying abstractions to ease our analysis of the INSERTION-
+SORT procedure. First, we ignored the actual cost of each statement, using the
+constants ci to represent these costs. Then, we observed that even these constants
+give us more detail than we really need: we expressed the worst-case running time
+as an2 C bn C c for some constants a, b,and c that depend on the statement
+costs ci . We thus ignored not only the actual statement costs, but also the abstract
+costs ci .
+We shall now make one more simplifying abstraction: it is the rate of growth,
+or order of growth, of the running time that really interests us. We therefore con-
+sider only the leading term of a formula (e.g., an2), since the lower-order terms are
+relatively insignificant for large values of n. We also ignore the leading term’s con-
+stant coefficient, since constant factors are less significant than the rate of growth
+in determining computational efficiency for large inputs. For insertion sort, when
+we ignore the lower-order terms and the leading term’s constant coefficient, we are
+left with the factor of n2 from the leading term. We write that insertion sort has a
+worst-case running time of ‚.n2/ (pronounced “theta of n-squared”). We shall use
+‚-notation informally in this chapter, and we will define it precisely in Chapter 3.
+We usually consider one algorithm to be more efficient than another if its worst-
+case running time has a lower order of growth. Due to constant factors and lower-
+order terms, an algorithm whose running time has a higher order of growth might
+take less time for small inputs than an algorithm whose running time has a lower2.3 Designing algorithms
+29
+order of growth. But for large enough inputs, a ‚.n2/ algorithm, for example, will
+run more quickly in the worst case than a ‚.n3/ algorithm.
+Exercises
+2.2-1
+Express the function n3=1000  100n2  100n C 3 in terms of ‚-notation.
+2.2-2
+Consider sorting n numbers stored in array A by first finding the smallest element
+of A and exchanging it with the element in AŒ1. Then find the second smallest
+element of A, and exchange it with AŒ2. Continue in this manner for the first n1
+elements of A. Write pseudocode for this algorithm, which is known as selection
+sort. What loop invariant does this algorithm maintain? Why does it need to run
+for only the first n  1 elements, rather than for all n elements? Give the best-case
+and worst-case running times of selection sort in ‚-notation.
+2.2-3
+Consider linear search again (see Exercise 2.1-3). How many elements of the in-
+put sequence need to be checked on the average, assuming that the element being
+searched for is equally likely to be any element in the array? How about in the
+worst case? What are the average-case and worst-case running times of linear
+search in ‚-notation? Justify your answers.
+2.2-4
+How can we modify almost any algorithm to have a good best-case running time?
+2.3 Designing algorithms
+We can choose from a wide range of algorithm design techniques. For insertion
+sort, we used an incremental approach: having sorted the subarray AŒ1 : : j  1,
+we inserted the single element AŒj  into its proper place, yielding the sorted
+subarray AŒ1 : : j .
+In this section, we examine an alternative design approach, known as “divide-
+and-conquer,” which we shall explore in more detail in Chapter 4. We’ll use divide-
+and-conquer to design a sorting algorithm whose worst-case running time is much
+less than that of insertion sort. One advantage of divide-and-conquer algorithms is
+that their running times are often easily determined using techniques that we will
+see in Chapter 4.30
+Chapter 2 Getting Started
+2.3.1 The divide-and-conquer approach
+Many useful algorithms are recursive in structure: to solve a given problem, they
+call themselves recursively one or more times to deal with closely related sub-
+problems. These algorithms typically follow a divide-and-conquer approach: they
+break the problem into several subproblems that are similar to the original prob-
+lem but smaller in size, solve the subproblems recursively, and then combine these
+solutions to create a solution to the original problem.
+The divide-and-conquer paradigm involves three steps at each level of the recur-
+sion:
+Divide the problem into a number of subproblems that are smaller instances of the
+same problem.
+Conquer the subproblems by solving them recursively. If the subproblem sizes are
+small enough, however, just solve the subproblems in a straightforward manner.
+Combine the solutions to the subproblems into the solution for the original prob-
+lem.
+The merge sort algorithm closely follows the divide-and-conquer paradigm. In-
+tuitively, it operates as follows.
+Divide: Divide the n-element sequence to be sorted into two subsequences of n=2
+elements each.
+Conquer: Sort the two subsequences recursively using merge sort.
+Combine: Merge the two sorted subsequences to produce the sorted answer.
+The recursion “bottoms out” when the sequence to be sorted has length 1, in which
+case there is no work to be done, since every sequence of length 1 is already in
+sorted order.
+The key operation of the merge sort algorithm is the merging of two sorted
+sequences in the “combine” step. We merge by calling an auxiliary procedure
+MERGE.A;p;q;r/,where A is an array and p, q,and r are indices into the array
+such that p  q< r. The procedure assumes that the subarrays AŒp : : q and
+AŒq C 1 ::r are in sorted order. It merges them to form a single sorted subarray
+that replaces the current subarray AŒp : : r.
+Our MERGE procedure takes time ‚.n/,where n D r  p C 1 is the total
+number of elements being merged, and it works as follows. Returning to our card-
+playing motif, suppose we have two piles of cards face up on a table. Each pile is
+sorted, with the smallest cards on top. We wish to merge the two piles into a single
+sorted output pile, which is to be face down on the table. Our basic step consists
+of choosing the smaller of the two cards on top of the face-up piles, removing it
+from its pile (which exposes a new top card), and placing this card face down onto2.3 Designing algorithms
+31
+the output pile. We repeat this step until one input pile is empty, at which time
+we just take the remaining input pile and place it face down onto the output pile.
+Computationally, each basic step takes constant time, since we are comparing just
+the two top cards. Since we perform at most n basic steps, merging takes ‚.n/
+time.
+The following pseudocode implements the above idea, but with an additional
+twist that avoids having to check whether either pile is empty in each basic step.
+We place on the bottom of each pile a sentinel card, which contains a special value
+that we use to simplify our code. Here, we use 1 as the sentinel value, so that
+whenever a card with 1 is exposed, it cannot be the smaller card unless both piles
+have their sentinel cards exposed. But once that happens, all the nonsentinel cards
+have already been placed onto the output pile. Since we know in advance that
+exactly r  p C 1 cards will be placed onto the output pile, we can stop once we
+have performed that many basic steps.
+MERGE.A;p;q;r/
+1 n1 D q  p C 1
+2 n2 D r  q
+3let LŒ1 ::n1 C 1 and RŒ1 : : n2 C 1 be new arrays
+4 for i D 1 to n1
+5
+6 for j D 1 to n2
+7
+10 i D 1
+11 j D 1
+12 for k D p to r
+13
+14
+15
+16
+17
+LŒi D AŒp C i  1
+RŒj  D AŒq C j
+8 LŒn1 C 1 D1
+9 RŒn2 C 1 D1
+if LŒi  RŒj 
+AŒk D LŒi
+i D i C 1
+else AŒk D RŒj 
+j D j C 1
+In detail, the MERGE procedure works as follows. Line 1 computes the length n1
+of the subarray AŒp : : q, and line 2 computes the length n2 of the subarray
+AŒq C 1 ::r. We create arrays L and R (“left” and “right”), of lengths n1 C 1
+and n2 C 1, respectively, in line 3; the extra position in each array will hold the
+sentinel. The for loop of lines 4–5 copies the subarray AŒp : : q into LŒ1 ::n1,
+and the for loop of lines 6–7 copies the subarray AŒq C 1 ::r into RŒ1 ::n2.
+Lines 8–9 put the sentinels at the ends of the arrays L and R. Lines 10–17, illus-32
+Chapter 2 Getting Started
+8
+9 10111213141516
+A … 24571236
+k
+LR
+1234 1234
+5
+∞
+j
+(a)
+8
+A …
+LR 1 236 ∞
+j
+2457
+1
+1234 1234
+i
+k
+5
+∞
+(c)
+9 10111213141516
+2 571236
+17
+…
+5
+8
+A …
+LR
+1234 1234
+2457
+1
+i
+(d)
+Figure 2.3 The operation of lines 10–17 in the call MERGE.A; 9; 12; 16/, when the subarray
+AŒ9 : : 16 contains the sequence h2; 4; 5; 7; 1; 2; 3; 6i. After copying and inserting sentinels, the
+array L contains h2; 4; 5; 7; 1i, and the array R contains h1; 2; 3; 6; 1i. Lightly shaded positions
+in A contain their final values, and lightly shaded positions in L and R contain values that have yet
+to be copied back into A. Taken together, the lightly shaded positions always comprise the values
+originally in AŒ9 : : 16, along with the two sentinels. Heavily shaded positions in A contain values
+that will be copied over, and heavily shaded positions in L and R contain values that have already
+been copied back into A. (a)–(h) The arrays A, L,and R, and their respective indices k, i,and j
+prior to each iteration of the loop of lines 12–17.
+trated in Figure 2.3, perform the r pC1 basic steps by maintaining the following
+loop invariant:
+At the start of each iteration of the for loop of lines 12–17, the subarray
+AŒp : : k  1 contains the k  p smallest elements of LŒ1 ::n1 C 1 and
+RŒ1 : : n2 C 1, in sorted order. Moreover, LŒi and RŒj  are the smallest
+elements of their arrays that have not been copied back into A.
+We must show that this loop invariant holds prior to the first iteration of the for
+loop of lines 12–17, that each iteration of the loop maintains the invariant, and
+that the invariant provides a useful property to show correctness when the loop
+terminates.
+Initialization: Prior to the first iteration of the loop, we have k D p, so that the
+subarray AŒp : : k  1 is empty. This empty subarray contains the k  p D 0
+smallest elements of L and R, and since i D j D 1, both LŒi and RŒj  are the
+smallest elements of their arrays that have not been copied back into A.
+5
+∞
+17
+…
+5
+2457 1236 ∞
+i
+8
+A …
+LR
+1234 1234
+2457
+1
+k
+5
+∞
+i
+(b)
+9 10111213141516
+22 71236
+k
+5
+1 236 ∞
+j
+17
+…
+5
+1 236 ∞
+j
+9 10111213141516
+4571236
+17
+…2.3 Designing algorithms
+33
+8
+A …
+9 10111213141516
+LR
+1234 1234
+2457
+1
+i
+(e)
+8
+A …
+9 10111213141516
+LR
+1234 1234
+2457
+1
+i
+(g)
+8
+A …
+LR
+1234 1234
+2457
+1
+5
+∞
+i
+(i)
+Figure 2.3, continued (i) The arrays and indices at termination. At this point, the subarray in
+AŒ9 : : 16 is sorted, and the two sentinels in L and R are the only two elements in these arrays that
+have not been copied into A.
+Maintenance: To see that each iteration maintains the loop invariant, let us first
+suppose that LŒi  RŒj .Then LŒi is the smallest element not yet copied
+back into A. Because AŒp : : k  1 contains the k  p smallest elements, after
+line 14 copies LŒi into AŒk, the subarray AŒp : : k will contain the k  p C 1
+smallest elements. Incrementing k (in the for loop update) and i (in line 15)
+reestablishes the loop invariant for the next iteration. If instead LŒi > RŒj ,
+then lines 16–17 perform the appropriate action to maintain the loop invariant.
+Termination: At termination, k D r C 1. By the loop invariant, the subarray
+AŒp : : k  1,which is AŒp : : r, contains the k  p D r  p C 1 smallest
+elements of LŒ1 ::n1 C 1 and RŒ1 ::n2 C 1, in sorted order. The arrays L
+and R together contain n1 C n2 C 2 D r  p C 3 elements. All but the two
+largest have been copied back into A, and these two largest elements are the
+sentinels.
+9 10111213141516
+6
+17
+…
+k
+5
+∞
+j
+1 236
+22345 7
+5
+∞
+j
+k
+17
+…
+5
+∞
+8
+1 236
+22345 36
+A …
+LR
+1234 1234
+2457
+1
+i
+(h)
+5
+∞
+5
+∞
+j
+k
+17
+…
+5
+∞
+8
+1 236
+223 1236
+A …
+9 10111213141516
+LR
+1234 1234
+2457
+1
+i
+(f)
+9 10111213141516
+6
+k
+17
+…
+5
+∞
+j
+1 236
+22345 6
+5
+∞
+j
+k
+17
+…
+5
+∞
+1 236
+2234 23634
+Chapter 2 Getting Started
+To see that the MERGE procedure runs in ‚.n/ time, where n D r  p C 1,
+observe that each of lines 1–3 and 8–11 takes constant time, the for loops of
+lines 4–7 take ‚.n1 C n2/ D ‚.n/ time,7 and there are n iterations of the for
+loop of lines 12–17, each of which takes constant time.
+We can now use the MERGE procedure as a subroutine in the merge sort al-
+gorithm. The procedure MERGE-SORT.A;p;r/ sorts the elements in the subar-
+ray AŒp : : r.If p  r, the subarray has at most one element and is therefore
+already sorted. Otherwise, the divide step simply computes an index q that par-
+titions AŒp : : r into two subarrays: AŒp : : q, containing dn=2e elements, and
+AŒq C 1 ::r, containing bn=2c elements.8
+MERGE-SORT.A;p;r/
+1 if p< r
+2
+q D b.p C r/=2c
+3MERGE-SORT.A;p;q/
+4MERGE-SORT.A; q C 1; r/
+5MERGE.A;p;q;r/
+To sort the entire sequence A DhAŒ1; AŒ2; : : : ; AŒni, we make the initial call
+MERGE-SORT.A;1;A:length/, where once again A:length D n. Figure 2.4 il-
+lustrates the operation of the procedure bottom-up when n isapower of 2.The
+algorithm consists of merging pairs of 1-item sequences to form sorted sequences
+of length 2, merging pairs of sequences of length 2 to form sorted sequences of
+length 4, and so on, until two sequences of length n=2 are merged to form the final
+sorted sequence of length n.
+2.3.2 Analyzing divide-and-conquer algorithms
+When an algorithm contains a recursive call to itself, we can often describe its
+running time by a recurrence equation or recurrence, which describes the overall
+running time on a problem of size n in terms of the running time on smaller inputs.
+We can then use mathematical tools to solve the recurrence and provide bounds on
+the performance of the algorithm.
+7We shall see in Chapter 3 how to formally interpret equations containing ‚-notation.
+8The expression dxe denotes the least integer greater than or equal to x,and bxc denotes the greatest
+integer less than or equal to x. These notations are defined in Chapter 3. The easiest way to verify
+that setting q to b.p C r/=2c yields subarrays AŒp : : q and AŒq C 1::r of sizes dn=2e and bn=2c,
+respectively, is to examine the four cases that arise depending on whether each of p and r is odd or
+even.2.3 Designing algorithms
+35
+sorted sequence
+12234567
+merge
+2457 1236
+merge
+merge
+25 47 13 26
+merge
+merge
+merge
+merge
+52471326
+initial sequence
+Figure 2.4 The operation of merge sort on the array A Dh5; 2; 4; 7; 1; 3; 2; 6i. The lengths of the
+sorted sequences being merged increase as the algorithm progresses from bottom to top.
+A recurrence for the running time of a divide-and-conquer algorithm falls out
+from the three steps of the basic paradigm. As before, we let T.n/ be the running
+time on a problem of size n. If the problem size is small enough, say n  c
+for some constant c, the straightforward solution takes constant time, which we
+write as ‚.1/. Suppose that our division of the problem yields a subproblems,
+each of which is 1=b the size of the original. (For merge sort, both a and b are 2,
+but we shall see many divide-and-conquer algorithms in which a ¤ b.) It takes
+time T.n=b/ to solve one subproblem of size n=b, and so it takes time aT.n=b/
+to solve a of them. If we take D.n/ time to divide the problem into subproblems
+and C.n/ time to combine the solutions to the subproblems into the solution to the
+original problem, we get the recurrence
+T.n/ D
+(
+‚.1/
+if n  c;
+aT.n=b/ CD.n/ CC.n/ otherwise :
+In Chapter 4, we shall see how to solve common recurrences of this form.
+Analysis of merge sort
+Although the pseudocode for MERGE-SORT works correctly when the number of
+elements is not even, our recurrence-based analysis is simplified if we assume that36
+Chapter 2 Getting Started
+the original problem size is a power of 2. Each divide step then yields two subse-
+quences of size exactly n=2. In Chapter 4, we shall see that this assumption does
+not affect the order of growth of the solution to the recurrence.
+We reason as follows to set up the recurrence for T.n/, the worst-case running
+time of merge sort on n numbers. Merge sort on just one element takes constant
+time. When we have n>1 elements, we break down the running time as follows.
+Divide: The divide step just computes the middle of the subarray, which takes
+constant time. Thus, D.n/ D ‚.1/.
+Conquer: We recursively solve two subproblems, each of size n=2, which con-
+tributes 2T.n=2/ to the running time.
+Combine: We have already noted that the MERGE procedure on an n-element
+subarray takes time ‚.n/,and so C.n/ D ‚.n/.
+When we add the functions D.n/ and C.n/ for the merge sort analysis, we are
+adding a function that is ‚.n/ and a function that is ‚.1/. This sum is a linear
+function of n,that is, ‚.n/. Adding it to the 2T.n=2/ term from the “conquer”
+step gives the recurrence for the worst-case running time T.n/ of merge sort:
+T.n/ D
+(
+‚.1/
+if n D 1;
+2T.n=2/ C ‚.n/ if n>1 :
+(2.1)
+In Chapter 4, we shall see the “master theorem,” which we can use to show
+that T.n/ is ‚.n lg n/, where lg n stands for log2 n. Because the logarithm func-
+tion grows more slowly than any linear function, for large enough inputs, merge
+sort, with its ‚.n lg n/ running time, outperforms insertion sort, whose running
+time is ‚.n2/, in the worst case.
+We do not need the master theorem to intuitively understand why the solution to
+the recurrence (2.1) is T.n/ D ‚.n lg n/. Let us rewrite recurrence (2.1) as
+T.n/ D
+(
+c
+if n D 1;
+2T.n=2/ C cn if n> 1 ;
+(2.2)
+where the constant c represents the time required to solve problems of size 1 as
+well as the time per array element of the divide and combine steps.9
+9It is unlikely that the same constant exactly represents both the time to solve problems of size 1
+and the time per array element of the divide and combine steps. We can get around this problem by
+letting c be the larger of these times and understanding that our recurrence gives an upper bound on
+the running time, or by letting c be the lesser of these times and understanding that our recurrence
+gives a lower bound on the running time. Both bounds are on the order of n lg n and, taken together,
+give a ‚.n lg n/ running time.2.3 Designing algorithms
+37
+Figure 2.5 shows how we can solve recurrence (2.2). For convenience, we as-
+sume that n is an exact power of 2. Part (a) of the figure shows T.n/,which we
+expand in part (b) into an equivalent tree representing the recurrence. The cn term
+is the root (the cost incurred at the top level of recursion), and the two subtrees of
+the root are the two smaller recurrences T.n=2/. Part (c) shows this process carried
+one step further by expanding T.n=2/. The cost incurred at each of the two sub-
+nodes at the second level of recursion is cn=2. We continue expanding each node
+in the tree by breaking it into its constituent parts as determined by the recurrence,
+until the problem sizes get down to 1, each with a cost of c. Part (d) shows the
+resulting recursion tree.
+Next, we add the costs across each level of the tree. The top level has total
+cost cn, the next level down has total cost c.n=2/ C c.n=2/ D cn, the level after
+that has total cost c.n=4/Cc.n=4/Cc.n=4/Cc.n=4/ D cn, and so on. In general,
+the level i below the top has 2i nodes, each contributing a cost of c.n=2i /,so that
+the ith level below the top has total cost 2i c.n=2i / D cn. The bottom level has n
+nodes, each contributing a cost of c, for a total cost of cn.
+The total number of levels of the recursion tree in Figure 2.5 is lgn C 1,where
+n is the number of leaves, corresponding to the input size. An informal inductive
+argument justifies this claim. The base case occurs when n D 1, in which case the
+tree has only one level. Since lg 1 D 0,we have that lg n C 1 gives the correct
+number of levels. Now assume as an inductive hypothesis that the number of levels
+of a recursion tree with 2i leaves is lg 2i C 1 D i C 1 (since for any value of i ,
+we have that lg 2i D i ). Because we are assuming that the input size is a power
+of 2, the next input size to consider is 2iC1. A tree with n D 2iC1 leaves has
+one more level than a tree with 2i leaves, and so the total number of levels is
+.i C 1/ C 1 D lg 2iC1 C 1.
+To compute the total cost represented by the recurrence (2.2), we simply add up
+the costs of all the levels. The recursion tree has lg n C 1 levels, each costing cn,
+for a total cost of cn.lg n C 1/ D cn lg n C cn. Ignoring the low-order term and
+the constant c gives the desired result of ‚.n lg n/.
+Exercises
+2.3-1
+Using Figure 2.4 as a model, illustrate the operation of merge sort on the array
+A Dh3; 41; 52; 26; 38; 57; 9; 49i.
+2.3-2
+Rewrite the MERGE procedure so that it does not use sentinels, instead stopping
+once either array L or R has had all its elements copied back to A and then copying
+the remainder of the other array back into A.38
+Chapter 2 Getting Started
+T(n)
+cn
+cn
+T(n/2)
+T(n/2)
+cn/2
+cn/2
+T(n/4)
+(a)
+(b)
+T(n/4)
+(c)
+T(n/4)
+T(n/4)
+cn
+cn
+cn/2
+cn/2
+lg n
+cn/4
+cn/4
+cn/4
+cn/4
+cn
+cn
+c
+c
+c
+c
+n
+(d)
+Total: cn lg n + cn
+Figure 2.5 How to construct a recursion tree for the recurrence T.n/ D 2T.n=2/ C cn.
+Part (a) shows T.n/, which progressively expands in (b)–(d) to form the recursion tree. The fully
+expanded tree in part (d) has lgn C 1 levels (i.e., it has height lg n, as indicated), and each level
+contributes a total cost of cn. The total cost, therefore, is cn lg n C cn,which is ‚.n lg n/.
+c … c
+c
+cn
+…Problems for Chapter 2
+39
+2.3-3
+Use mathematical induction to show that when n is an exact power of 2,the solu-
+tion of the recurrence
+T.n/ D
+(
+2
+is T.n/ D n lg n.
+2.3-4
+We can express insertion sort as a recursive procedure as follows. In order to sort
+AŒ1 : : n, we recursively sort AŒ1 : : n1 and then insert AŒn into the sorted array
+AŒ1 : : n  1. Write a recurrence for the running time of this recursive version of
+insertion sort.
+2.3-5
+Referring back to the searching problem (see Exercise 2.1-3), observe that if the
+sequence A is sorted, we can check the midpoint of the sequence against  and
+eliminate half of the sequence from further consideration. The binary search al-
+gorithm repeats this procedure, halving the size of the remaining portion of the
+sequence each time. Write pseudocode, either iterative or recursive, for binary
+search. Argue that the worst-case running time of binary search is ‚.lg n/.
+2.3-6
+Observe that the while loop of lines 5–7 of the INSERTION-SORT procedure in
+Section 2.1 uses a linear search to scan (backward) through the sorted subarray
+AŒ1 : : j  1. Can we use a binary search (see Exercise 2.3-5) instead to improve
+the overall worst-case running time of insertion sort to ‚.n lg n/?
+2.3-7 ?
+Describe a ‚.n lg n/-time algorithm that, given a set S of n integers and another
+integer x, determines whether or not there exist two elements in S whose sum is
+exactly x.
+Problems
+2-1 Insertion sort on small arrays in merge sort
+Although merge sort runs in ‚.n lg n/ worst-case time and insertion sort runs
+in ‚.n2/ worst-case time, the constant factors in insertion sort can make it faster
+in practice for small problem sizes on many machines. Thus, it makes sense to
+coarsen the leaves of the recursion by using insertion sort within merge sort when
+if n D 2;
+2T.n=2/ C n if n D 2k,for k> 140
+Chapter 2 Getting Started
+subproblems become sufficiently small. Consider a modification to merge sort in
+which n=k sublists of length k are sorted using insertion sort and then merged
+using the standard merging mechanism, where k is a value to be determined.
+a. Show that insertion sort can sort the n=k sublists, each of length k,in ‚.nk/
+worst-case time.
+b. Show how to merge the sublists in ‚.n lg.n=k// worst-case time.
+c. Given that the modified algorithm runs in ‚.nk Cn lg.n=k// worst-case time,
+what is the largest value of k as a function ofn for which the modified algorithm
+has the same running time as standard merge sort, in terms of ‚-notation?
+d. How should we choose k in practice?
+2-2 Correctness ofbubblesort
+Bubblesort is a popular, but inefficient, sorting algorithm. It works by repeatedly
+swapping adjacent elements that are out of order.
+BUBBLESORT.A/
+1 for i D 1 to A:length  1
+2
+3
+4
+for j D A:length downto i C 1
+if AŒj  < AŒj  1
+exchange AŒj  with AŒj  1
+a. Let A0 denote the output of BUBBLESORT.A/. To prove that BUBBLESORT is
+correct, we need to prove that it terminates and that
+A0Œ1  A0Œ2    A0Œn ;
+(2.3)
+where n D A:length. In order to show that BUBBLESORT actually sorts, what
+else do we need to prove?
+The next two parts will prove inequality (2.3).
+b. State precisely a loop invariant for the for loop in lines 2–4, and prove that this
+loop invariant holds. Your proof should use the structure of the loop invariant
+proof presented in this chapter.
+c. Using the termination condition of the loop invariant proved in part (b), state
+a loop invariant for the for loop in lines 1–4 that will allow you to prove in-
+equality (2.3). Your proof should use the structure of the loop invariant proof
+presented in this chapter.Problems for Chapter 2
+41
+d. What is the worst-case running time of bubblesort? How does it compare to the
+running time of insertion sort?
+2-3 Correctness ofHorner’s rule
+The following code fragment implements Horner’s rule for evaluating a polynomial
+P.x/ D
+Xn
+kD0
+akxk
+D a0 C x.a1 C x.a2 C  C x.an1 C xan/ // ;
+given the coefficients a0;a1; :::; an and a value for x:
+1 y D 0
+2 for i D n downto 0
+3
+y D ai C x  y
+a. In terms of ‚-notation, what is the running time of this code fragment for
+Horner’s rule?
+b. Write pseudocode to implement the naive polynomial-evaluation algorithm that
+computes each term of the polynomial from scratch. What is the running time
+of this algorithm? How does it compare to Horner’s rule?
+c. Consider the following loop invariant:
+At the start of each iteration of the for loop of lines 2–3,
+y D
+n.iC1/X
+kD0
+akCiC1xk :
+Interpret a summation with no terms as equaling 0. Following the structure of
+the loop invariant proof presented in this chapter, use this loop invariant to show
+that, at termination, y D
+Pn
+kD0 akxk.
+d. Conclude by arguing that the given code fragment correctly evaluates a poly-
+nomial characterized by the coefficients a0;a1; :::; an.
+2-4 Inversions
+Let AŒ1 : : n be an array of n distinct numbers. If i< j and AŒi > AŒj , then the
+pair .i; j / is called an inversion of A.
+a. List the five inversions of the array h2; 3; 8; 6; 1i.42
+Chapter 2 Getting Started
+b. What array with elements from the set f1; 2; ::: ; ng has the most inversions?
+How many does it have?
+c. What is the relationship between the running time of insertion sort and the
+number of inversions in the input array? Justify your answer.
+d. Give an algorithm that determines the number of inversions in any permutation
+on n elements in ‚.n lg n/ worst-case time. (Hint: Modify merge sort.)
+Chapter notes
+In 1968, Knuth published the first of three volumes with the general title The Art of
+Computer Programming [209, 210, 211]. The first volume ushered in the modern
+study of computer algorithms with a focus on the analysis of running time, and the
+full series remains an engaging and worthwhile reference for many of the topics
+presented here. According to Knuth, the word “algorithm” is derived from the
+name “al-Khowˆarizmˆı,” a ninth-century Persian mathematician.
+Aho, Hopcroft, and Ullman [5] advocated the asymptotic analysis of algo-
+rithms—using notations that Chapter 3 introduces, including ‚-notation—as a
+means of comparing relative performance. They also popularized the use of re-
+currence relations to describe the running times of recursive algorithms.
+Knuth [211] provides an encyclopedic treatment ofmany sorting algorithms. His
+comparison of sorting algorithms (page 381) includes exact step-counting analyses,
+like the one we performed here for insertion sort. Knuth’s discussion of insertion
+sort encompasses several variations of the algorithm. The most important of these
+is Shell’s sort, introduced by D. L. Shell, which uses insertion sort on periodic
+subsequences of the input to produce a faster sorting algorithm.
+Merge sort is also described by Knuth. He mentions that a mechanical colla-
+tor capable of merging two decks of punched cards in a single pass was invented
+in 1938. J. von Neumann, one of the pioneers of computer science, apparently
+wrote a program for merge sort on the EDVAC computer in 1945.
+The early history of proving programs correct is described by Gries [153], who
+credits P. Naur with the first article in this field. Gries attributes loop invariants to
+R. W. Floyd. The textbook by Mitchell [256] describes more recent progress in
+proving programs correct.3 Growth of Functions
+The order of growth of the running time of an algorithm, defined in Chapter 2,
+gives a simple characterization of the algorithm’s efficiency and also allows us to
+compare the relative performance of alternative algorithms. Once the input size n
+becomes large enough, merge sort, with its ‚.n lg n/ worst-case running time,
+beats insertion sort, whose worst-case running time is ‚.n2/. Although we can
+sometimes determine the exact running time of an algorithm, as we did for insertion
+sort in Chapter 2, the extra precision is not usually worth the effort of computing
+it. For large enough inputs, the multiplicative constants and lower-order terms of
+an exact running time are dominated by the effects of the input size itself.
+When we look at input sizes large enough to make only the order of growth of
+the running time relevant, we are studying the asymptotic efficiency of algorithms.
+That is, we are concerned with how the running time of an algorithm increases with
+the size of the input in the limit, as the size of the input increases without bound.
+Usually, an algorithm that is asymptotically more efficient will be the best choice
+for all but very small inputs.
+This chapter gives several standard methods for simplifying the asymptotic anal-
+ysis of algorithms. The next section begins by defining several types of “asymp-
+totic notation,” of which we have already seen an example in ‚-notation. We then
+present several notational conventions used throughout this book, and finally we
+review the behavior of functions that commonly arise in the analysis of algorithms.
+3.1 Asymptotic notation
+The notations we use to describe the asymptotic running time of an algorithm
+are defined in terms of functions whose domains are the set of natural numbers
+N D f0; 1; 2; : : :g. Such notations are convenient for describing the worst-case
+running-time function T.n/, which usually is defined only on integer input sizes.
+We sometimes find it convenient, however, to abuse asymptotic notation in a va-44
+Chapter 3 Growth ofFunctions
+riety of ways. For example, we might extend the notation to the domain of real
+numbers or, alternatively, restrict it to a subset of the natural numbers. We should
+make sure, however, to understand the precise meaning of the notation so that when
+we abuse, we do not misuse it. This section defines the basic asymptotic notations
+and also introduces some common abuses.
+Asymptotic notation, functions, and running times
+We will use asymptotic notation primarily to describe the running times of algo-
+rithms, as when we wrote that insertion sort’s worst-case running time is ‚.n2/.
+Asymptotic notation actually applies to functions, however. Recall that we charac-
+terized insertion sort’s worst-case running time as an2CbnCc, for some constants
+a, b,and c. By writing that insertion sort’s running time is ‚.n2/, we abstracted
+away some details of this function. Because asymptotic notation applies to func-
+tions, what we were writing as ‚.n2/ was the function an2 C bn C c,which in
+that case happened to characterize the worst-case running time of insertion sort.
+In this book, the functions to which we apply asymptotic notation will usually
+characterize the running times of algorithms. But asymptotic notation can apply to
+functions that characterize some other aspect of algorithms (the amount of space
+they use, for example), or even to functions that have nothing whatsoever to do
+with algorithms.
+Even when we use asymptotic notation to apply to the running time of an al-
+gorithm, we need to understand which running time we mean. Sometimes we are
+interested in the worst-case running time. Often, however, we wish to characterize
+the running time no matter what the input. In other words, we often wish to make
+a blanket statement that covers all inputs, not just the worst case. We shall see
+asymptotic notations that are well suited to characterizing running times no matter
+what the input.
+‚-notation
+In Chapter 2, we found that the worst-case running time of insertion sort is
+T.n/ D ‚.n2/. Let us define what this notation means. For a given function g.n/,
+we denote by ‚.g.n// the set offunctions
+‚.g.n// Dff.n/ W there exist positive constants c1, c2,and n0 such that
+0  c1g.n/  f.n/  c2g.n/ for all n  n0g :1
+1Within set notation, a colon means “such that.”3.1 Asymptotic notation
+45
+c2g.n/
+f.n/
+c1g.n/
+cg.n/
+f.n/
+f.n/
+cg.n/
+n
+n
+n0
+f.n/ D ‚.g.n//
+(a)
+n0
+f.n/ D O.g.n//
+(b)
+n0
+f.n/ D .g.n//
+(c)
+Figure 3.1 Graphic examples of the ‚, O,and  notations. In each part, the value of n0 shown
+is the minimum possible value; any greater value would also work. (a) ‚-notation bounds a func-
+tion to within constant factors. We write f.n/ D ‚.g.n// if there exist positive constants n0, c1,
+and c2 such that at and to the right of n0,the value of f.n/ always lies between c1g.n/ and c2g.n/
+inclusive. (b) O-notation gives an upper bound for a function to within a constant factor. We write
+f.n/ D O.g.n// if there are positive constants n0 and c such that at and to the right of n0,the value
+of f.n/ always lies on or below cg.n/. (c) -notation gives a lower bound for a function to within
+a constant factor. We write f.n/ D .g.n// if there are positive constants n0 and c such that at and
+to the right of n0,the value of f.n/ always lies on or above cg.n/.
+A function f.n/ belongs to the set ‚.g.n// if there exist positive constants c1
+and c2 such that it can be “sandwiched” between c1g.n/ and c2g.n/,for suffi-
+ciently large n. Because ‚.g.n// is a set, we could write “f.n/ 2 ‚.g.n//”
+to indicate that f.n/ is a member of ‚.g.n//. Instead, we will usually write
+“f.n/ D ‚.g.n//” to express the same notion. You might be confused because
+we abuse equality in this way, but we shall see later in this section that doing so
+has its advantages.
+Figure 3.1(a) gives an intuitive picture of functions f.n/ and g.n/,where
+f.n/ D ‚.g.n//. For all values of n at and to the right of n0,the valueof f.n/
+lies at or above c1g.n/ and at or below c2g.n/. In other words, for all n  n0,the
+function f.n/ is equal to g.n/ to within a constant factor. We say that g.n/ is an
+asymptotically tight bound for f.n/.
+The definition of ‚.g.n// requires that every member f.n/ 2 ‚.g.n// be
+asymptotically nonnegative, that is, that f.n/ be nonnegative whenever n is suf-
+ficiently large. (An asymptotically positive function is one that is positive for all
+sufficiently large n.) Consequently, the function g.n/ itself must be asymptotically
+nonnegative, or else the set ‚.g.n// is empty. We shall therefore assume that every
+function used within ‚-notation is asymptotically nonnegative. This assumption
+holds for the other asymptotic notations defined in this chapter as well.
+n46
+Chapter 3 Growth ofFunctions
+In Chapter 2, we introduced an informal notion of ‚-notation that amounted
+to throwing away lower-order terms and ignoring the leading coefficient of the
+highest-order term. Let us briefly justify this intuition by using the formal defi-
+nition to show that 1
+2n2  3n D ‚.n2/. To do so, we must determine positive
+constants c1, c2,and n0 such that
+c1n2 
+1
+2
+1
+2
+
+n2  3n  c2n2
+for all n  n0. Dividing by n2 yields
+c1 
+3
+n
+ c2 :
+We can make the right-hand inequality hold for any value of n  1 by choosing any
+constant c2  1=2. Likewise, we can make the left-hand inequality hold for any
+value of n  7 by choosing any constant c1  1=14. Thus, by choosing c1 D 1=14,
+c2 D 1=2,and n0 D 7, we can verify that 1
+2n2  3n D ‚.n2/. Certainly, other
+2n2  3n; a different function
+choices for the constants exist, but the important thing is that some choice exists.
+Note that these constants depend on the function 1
+belonging to ‚.n2/ would usually require different constants.
+We can also use the formal definition to verify that 6n3 ¤ ‚.n2/. Suppose
+for the purpose of contradiction that c2 and n0 exist such that 6n3  c2n2 for
+all n  n0. But then dividing by n2 yields n  c2=6, which cannot possibly hold
+for arbitrarily large n,since c2 is constant.
+Intuitively, the lower-order terms of an asymptotically positive function can be
+ignored in determining asymptotically tight bounds because they are insignificant
+for large n.When n is large, even a tiny fraction of the highest-order term suf-
+fices to dominate the lower-order terms. Thus, setting c1 to a value that is slightly
+smaller than the coefficient of the highest-order term and setting c2 to a value that
+is slightly larger permits the inequalities in the definition of ‚-notation to be sat-
+isfied. The coefficient of the highest-order term can likewise be ignored, since it
+only changes c1 and c2 by a constant factor equal to the coefficient.
+As an example, consider any quadratic function f.n/ D an2 C bn C c,where
+a, b,and c are constants and a> 0. Throwing away the lower-order terms and
+ignoring the constant yields f.n/ D ‚.n2/. Formally, to show the same thing, we
+take the constants c1 D a=4, c2 D 7a=4,and n0 D 2  max.jbj =a;
+p
+Pd
+may verify that 0  c1n2  an2 C bn C c  c2n2 for all n  n0. In general,
+for any polynomial p.n/ D
+have p.n/ D ‚.nd / (see Problem 3-1).
+Since any constant is a degree-0 polynomial, we can express any constant func-
+tion as ‚.n0/,or ‚.1/. This latter notation is a minor abuse, however, because the
+jcj =a/.You
+iD0 aini , where the ai are constants and ad >0,we3.1 Asymptotic notation
+47
+expression does not indicate what variable is tending to infinity.2 We shall often
+use the notation ‚.1/ to mean either a constant or a constant function with respect
+to some variable.
+O-notation
+The ‚-notation asymptotically bounds a function from above and below. When
+we have only an asymptotic upper bound,we use O-notation. For a given func-
+tion g.n/, we denote by O.g.n// (pronounced “big-oh of g of n” or sometimes
+just “oh of g of n”) the set of functions
+O.g.n// Dff.n/ W there exist positive constants c and n0 such that
+0  f.n/  cg.n/ for all n  n0g :
+We use O-notation to give an upper bound on a function, to within a constant
+factor. Figure 3.1(b) shows the intuition behind O-notation. For all values n at and
+to the right of n0, the value of the function f.n/ is on or below cg.n/.
+We write f.n/ D O.g.n// to indicate that a function f.n/ isamemberofthe
+set O.g.n//. Note that f.n/ D ‚.g.n// implies f.n/ D O.g.n//,since ‚-
+notation is a stronger notion than O-notation. Written set-theoretically, we have
+‚.g.n//  O.g.n//. Thus, our proof that any quadratic function an2 C bn C c,
+where a> 0,isin ‚.n2/ also shows that any such quadratic function is in O.n2/.
+What may be more surprising is that when a> 0,any linear function an C b is
+in O.n2/, which is easily verified by taking c D a C jbj and n0 D max.1; b=a/.
+If you have seen O-notation before, you might find it strange that we should
+write, for example, n D O.n2/. In the literature, we sometimes find O-notation
+informally describing asymptotically tight bounds, that is, what we have defined
+using ‚-notation. In this book, however, when we write f.n/ D O.g.n//,we
+are merely claiming that some constant multiple of g.n/ is an asymptotic upper
+bound on f.n/, with no claim about how tight an upper bound it is. Distinguish-
+ing asymptotic upper bounds from asymptotically tight bounds is standard in the
+algorithms literature.
+Using O-notation, we can often describe the running time of an algorithm
+merely by inspecting the algorithm’s overall structure. For example, the doubly
+nested loop structure of the insertion sort algorithm from Chapter 2 immediately
+yields an O.n2/ upper bound on the worst-case running time: the cost of each it-
+eration of the inner loop is bounded from above by O.1/ (constant), the indices i
+2The real problem is that our ordinary notation for functions does not distinguish functions from
+values. In -calculus, the parameters to a function are clearly specified: the function n2 could be
+written as n:n2,or even r:r2. Adopting a more rigorous notation, however, would complicate
+algebraic manipulations, and so we choose to tolerate the abuse.48
+Chapter 3 Growth ofFunctions
+and j are both at most n, and the inner loop is executed at most once for each of
+the n2 pairs of values for i and j .
+Since O-notation describes an upper bound, when we use it to bound the worst-
+case running time of an algorithm, we have a bound on the running time of the algo-
+rithm on every input—the blanket statement we discussed earlier. Thus, the O.n2/
+bound on worst-case running time of insertion sort also applies to its running time
+on every input. The ‚.n2/ bound on the worst-case running time of insertion sort,
+however, does not imply a ‚.n2/ bound on the running time of insertion sort on
+every input. For example, we saw in Chapter 2 that when the input is already
+sorted, insertion sort runs in ‚.n/ time.
+Technically, it is an abuse to say that the running time of insertion sort is O.n2/,
+since for a given n, the actual running time varies, depending on the particular
+input of size n. When we say “the running time is O.n2/,” we mean that there is a
+function f.n/ that is O.n2/ such that for any value of n, no matter what particular
+input of size n is chosen, the running time on that input is bounded from above by
+the value f.n/. Equivalently, we mean that the worst-case running time is O.n2/.
+-notation
+Just as O-notation provides an asymptotic upper bound on a function, -notation
+provides an asymptotic lower bound. For a given function g.n/, we denote
+by .g.n// (pronounced “big-omega of g of n” or sometimes just “omega of g
+of n”) the set of functions
+.g.n// Dff.n/ W there exist positive constants c and n0 such that
+0  cg.n/  f.n/ for all n  n0g :
+Figure 3.1(c) shows the intuition behind -notation. For all values n at or to the
+right of n0,the valueof f.n/ is on or above cg.n/.
+From the definitions of the asymptotic notations we have seen thus far, it is easy
+to prove the following important theorem (see Exercise 3.1-5).
+Theorem 3.1
+For any two functions f.n/ and g.n/,we have f.n/ D ‚.g.n// if and only if
+f.n/ D O.g.n// and f.n/ D .g.n//.
+As an example of the application of this theorem, our proof that an2 C bnC cD
+‚.n2/ for any constants a, b,and c,where a> 0, immediately implies that
+an2 C bn C c D .n2/ and an2CbnCc D O.n2/. In practice, rather than using
+Theorem 3.1 to obtain asymptotic upper and lower bounds from asymptotically
+tight bounds, as we did for this example, we usually use it to prove asymptotically
+tight bounds from asymptotic upper and lower bounds.3.1 Asymptotic notation
+49
+When we say that the running time (no modifier) of an algorithm is .g.n//,
+we mean that no matter what particular input of size n is chosen for each value
+ofn, the running time on that input is at least a constant times g.n/, for sufficiently
+large n. Equivalently, we are giving a lower bound on the best-case running time
+of an algorithm. For example, the best-case running time of insertion sort is .n/,
+which implies that the running time of insertion sort is .n/.
+The running time of insertion sort therefore belongs to both .n/ and O.n2/,
+since it falls anywhere between a linear function of n and a quadratic function of n.
+Moreover, these bounds are asymptotically as tight as possible: for instance, the
+running time of insertion sort is not .n2/, since there exists an input for which
+insertion sort runs in ‚.n/ time (e.g., when the input is already sorted). It is not
+contradictory, however, to say that the worst-case running time of insertion sort
+is .n2/, since there exists an input that causes the algorithm to take .n2/ time.
+Asymptotic notation in equations and inequalities
+We have already seen how asymptotic notation can be used within mathematical
+formulas. For example, in introducing O-notation, we wrote “n D O.n2/.” We
+might also write 2n2C3nC1 D 2n2C‚.n/. How do we interpret such formulas?
+When the asymptotic notation stands alone (that is, not within a larger formula)
+on the right-hand side of an equation (or inequality), as in n D O.n2/,we have
+already defined the equal sign to mean set membership: n 2 O.n2/. In general,
+however, when asymptotic notation appears in a formula, we interpret it as stand-
+ing for some anonymous function that we do not care to name. For example, the
+formula 2n2 C 3n C 1 D 2n2 C ‚.n/ means that 2n2 C 3n C 1 D 2n2 C f.n/,
+where f.n/ is some function in the set ‚.n/. In this case, we let f.n/ D 3n C 1,
+which indeed is in ‚.n/.
+Using asymptotic notation in this manner can help eliminate inessential detail
+and clutter in an equation. For example, in Chapter 2 we expressed the worst-case
+running time of merge sort as the recurrence
+T.n/ D 2T.n=2/ C ‚.n/ :
+If we are interested only in the asymptotic behavior of T.n/, there is no point in
+specifying all the lower-order terms exactly; they are all understood to be included
+in the anonymous function denoted by the term ‚.n/.
+The number of anonymous functions in an expression is understood to be equal
+to the number of times the asymptotic notation appears. For example, in the ex-
+pression

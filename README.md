@@ -8,18 +8,18 @@ Clone the project onto local computer.
 
 To run Huffman:  
 Go to Huffman-Encoding folder and simply run in terminal:  
-to compress:  .\compress.exe  
+to compress: .\compress.exe  
 to decompress: .\decompress.exe  
 
 To run LZW:  
 Go to LZW-Encoding folder and simply run in terminal:  
-to compress: .\lzw -c <input file name> <output file name>  
-to decompress:.\lzw -d <input file name> <output file name>  
+to compress:  .\lzw -c <input file name> <output file name>  
+to decompress:  .\lzw -d <input file name> <output file name>  
   
 To run PPM:
 Go to PPM-Encoding folder and simply run in terminal:  
 to compress: .\ppm c <input file name> <output file name>  
-to decompress:.\ppm d <input file name> <output file name>  
+to decompress: .\ppm d <input file name> <output file name>  
     
 To compile the files:  
   

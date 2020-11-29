@@ -1,8 +1,8 @@
-::File Compression Algorithms: Implementation And Comparisons::
+# File Compression Algorithms: Implementation And Comparisons
 
-Drive Link for video:https://drive.google.com/drive/u/0/folders/1WGlCyOIuyLYyLCYWPpSIzql1t42z2PQO
+## Drive Link for video:https://drive.google.com/drive/u/0/folders/1WGlCyOIuyLYyLCYWPpSIzql1t42z2PQO
 
-To run:  
+### To run:  
 Clone the project onto local computer.  
 (All the executable files are also uploaded. Simply you can clone and run without compiling)  
 
@@ -21,7 +21,7 @@ Go to PPM-Encoding folder and simply run in terminal:
 to compress: .\ppm c <input file name> <output file name>  
 to decompress: .\ppm d <input file name> <output file name>  
     
-To compile the files:  
+### To compile:  
   
 For Huffman-Go to Huffman-Encoding Folder and in terminal type:   
 For compression: g++ compress.cpp -o compress.exe  
